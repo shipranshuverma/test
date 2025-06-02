@@ -1,19 +1,18 @@
 pipeline {
     agent {
         docker {
-            image 'alpine' // lightweight image to test with
+            image 'openjdk:17-jdk-slim'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'  // mount Docker socket for Docker commands
         }
     }
     stages {
-        stage('Check Docker Agent') {
+        stage('Check Docker Agent with Java Image') {
             steps {
-                script {
-                    echo 'Checking Docker functionality...'
-                    sh 'echo "Docker version:"'
-                    sh 'docker --version || echo "Docker not available inside container"'
-                    sh 'echo "Running hello-world container..."'
-                    sh 'docker run hello-world || echo "Failed to run hello-world"'
-                }
+                echo 'Checking Docker version inside Java slim image...'
+                sh 'docker version || echo "Docker command not available"'
+
+                echo 'Running hello-world container as test...'
+                sh 'docker run --rm hello-world || echo "Failed to run hello-world container"'
             }
         }
     }
