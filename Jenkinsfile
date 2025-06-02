@@ -1,19 +1,21 @@
 pipeline {
-    agent {
-        docker {
-            image 'openjdk:17-jdk-slim'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'  // mount Docker socket for Docker commands
-        }
+  agent none
+  stages {
+    stage('Back-end') {
+      agent {
+        docker { image 'maven:3.8.1-adoptopenjdk-11' }
+      }
+      steps {
+        sh 'mvn --version'
+      }
     }
-    stages {
-        stage('Check Docker Agent with Java Image') {
-            steps {
-                echo 'Checking Docker version inside Java slim image...'
-                sh 'docker version || echo "Docker command not available"'
-
-                echo 'Running hello-world container as test...'
-                sh 'docker run --rm hello-world || echo "Failed to run hello-world container"'
-            }
-        }
+    stage('Front-end') {
+      agent {
+        docker { image 'node:16-alpine' }
+      }
+      steps {
+        sh 'node --version'
+      }
     }
+  }
 }
